@@ -40,13 +40,13 @@ try:
 except ModuleNotFoundError:
     import HeatExchangerUncertainty_Calculate as calc_engine # 원본 파일명 유지 시 적용
 
-st.title("♨️ sCO2 열교환기 몬테카를로 불확도 평가 시스템")
+st.title("sCO2 열교환기 몬테카를로 불확도 평가 계산기")
 st.markdown("---")
 
 # ==========================================
 # 좌측 사이드바: 사용자 입력(Input) UI 구성
 # ==========================================
-st.sidebar.header("⚙️ 운전 조건 및 센서 스펙 입력")
+st.sidebar.header("운전 조건 및 센서 스펙 입력")
 
 st.sidebar.subheader("1. 운전 조건 (Nominal)")
 P_nom = st.sidebar.number_input("운전 압력 (MPa)", value=8.0, step=0.1)
@@ -70,8 +70,8 @@ st.sidebar.markdown("---")
 if 'mcs_completed' not in st.session_state:
     st.session_state['mcs_completed'] = False
 
-if st.sidebar.button("🚀 MCS 100만 회 시뮬레이션 실행"):
-    with st.spinner('난수 연산 중...'):
+if st.sidebar.button("MCS 시뮬레이션 실행"):
+    with st.spinner('연산 중...'):
         # [수정] 백엔드로 넘길 딕셔너리에 5개 오차를 모두 포함
         user_params = {
             'P_nom': P_nom, 'T_in_nom': T_in_nom, 'T_out_nom': T_out_nom, 'DP_nom': DP_nom,
@@ -101,7 +101,7 @@ if st.session_state['mcs_completed']:
     # 계층 1: 기초 기기 사양 불확도
     # ⚠️ [수정 3] 5개의 독립 센서 오차를 나란히 출력하도록 수정 완료
     # -------------------------------------------------------------------------
-    st.header("📊 [계층 1] 개별 센서 표준불확도 ($1\sigma$, Type B)")
+    st.header("[계층 1] 개별 센서 표준불확도 ($1\sigma$, Type B)")
     
     c1, c2, c3, c4, c5 = st.columns(5)
     c1.metric("유출계수 오차", f"± {stat_results['std_C']:.3f} %")
@@ -118,7 +118,7 @@ if st.session_state['mcs_completed']:
     # -------------------------------------------------------------------------
     # 계층 2: 주요 변수 합성 불확도
     # -------------------------------------------------------------------------
-    st.header("⚙️ [계층 2] 주요 변수 합성 오차 분포 ($1\sigma$)")
+    st.header("[계층 2] 주요 변수 합성 오차 분포 ($1\sigma$)")
     st.caption("개별 센서 오차들이 질량유량, 온도차, 비열 연산식에 전파되어 합성된 분포")
 
     c4, c5, c6 = st.columns(3)
@@ -134,7 +134,7 @@ if st.session_state['mcs_completed']:
     # -------------------------------------------------------------------------
     # 계층 3: 최종 합성 불확도 (Heat Duty)
     # -------------------------------------------------------------------------
-    st.header("🚀 [계층 3] 최종 Heat Duty ($Q$) 확장불확도 (95%)")
+    st.header("[계층 3] 최종 Heat Duty ($Q$) 확장불확도 (95%)")
     
     U_Q = stat_results['U_Q_95']
     st.success(f"### **최종 sCO2 열교환기 성능($Q$) 95% 확장 불확도 ($k=2$): ± {U_Q:.3f} %**")
